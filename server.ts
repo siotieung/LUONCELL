@@ -12,7 +12,7 @@ async function startServer() {
   const PORT = parseInt(process.env.VITE_PORT || '3000', 10);
 
   // Ensure public/images directory exists
-  const imagesDir = path.join(process.cwd(), "images");
+  const imagesDir =  "/images";
   if (!fs.existsSync(imagesDir)) {
     fs.mkdirSync(imagesDir, { recursive: true });
   }
