@@ -23,6 +23,8 @@ interface Slide {
   name: string;
 }
 
+import { getAllAssetsImages } from './Utils';
+
 export default function App() {
   const [slides, setSlides] = useState<Slide[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -35,9 +37,7 @@ export default function App() {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await fetch('/api/images');
-        if (!response.ok) throw new Error('Failed to fetch images');
-        const data = await response.json();
+        const data = getAllAssetsImages();
         setSlides(data);
       } catch (error) {
         console.error('Error fetching images:', error);
