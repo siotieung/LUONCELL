@@ -1,15 +1,37 @@
 // src/utils/imageLoader.js
-export const getAllAssetsImages = () => {
-  // src/assets/images 폴더 내의 모든 이미지/동영상 파일을 가져옴
+
+// 언어 코드: 'kr' | 'en' | 'zh'
+export const getAllAssetsImages = (lang = 'kr') => {
   const modules = import.meta.glob('./assets/images/*.{png,jpg,jpeg,svg,mp4}', { eager: true });
 
-  return Object.entries(modules).map(([path, module], index) => {
-    const fileName = path.split('/').pop() ?? `파일 ${index + 1}`;
-    const name = fileName.replace(/\.[^/.]+$/, ''); // 확장자 제거
-    return {
-      id: String(index),
-      url: module.default, // Vite가 처리한 해시 경로
-      name,
-    };
+  const allFiles = Object.entries(modules).map(([path, module]) => {
+    const fileName = path.split('/').pop() ?? '';
+    const nameWithoutExt = fileName.replace(/\.[^/.]+$/, ''); // 확장자 제거
+    // baseName: 언어 접미사 제거 (e.g. "001_en" -> "001", "001" -> "001")
+    const baseName = nameWithoutExt.replace(/_(?:kr|en|zh)$/, '');
+    const langMatch = nameWithoutExt.match(/_([a-z]+)$/)?.[1] ?? null;
+    return { path, fileName, nameWithoutExt, baseName, langMatch, url: module.default };
   });
+
+  // 고유 baseName 목록 (정렬)
+  const baseNames = [...new Set(allFiles.map(f => f.baseName))].sort();
+
+  return baseNames.map((baseName) => {
+    // 1순위: 선택 언어 파일 (e.g. 001_en)
+    let file = allFiles.find(f => f.baseName === baseName && f.langMatch === lang);
+    // 2순위: 한국어 기본 파일 (001_kr)
+    if (!file) file = allFiles.find(f => f.baseName === baseName && f.langMatch === 'kr');
+    // 3순위: 접미사 없는 기본 파일 (001)
+    if (!file) file = allFiles.find(f => f.baseName === baseName && f.langMatch === null);
+    // 4순위: 같은 baseName의 아무 파일
+    if (!file) file = allFiles.find(f => f.baseName === baseName);
+
+    if (!file) return null;
+
+    return {
+      id: baseName,
+      url: file.url,
+      name: baseName,
+    };
+  }).filter(Boolean);
 };

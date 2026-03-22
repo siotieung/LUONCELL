@@ -25,6 +25,14 @@ interface Slide {
 
 import { getAllAssetsImages } from './Utils';
 
+type Lang = 'kr' | 'en' | 'zh';
+
+const LANG_LABELS: Record<Lang, string> = {
+  kr: '한국어',
+  en: 'English',
+  zh: '中文',
+};
+
 export default function App() {
   const [slides, setSlides] = useState<Slide[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,22 +40,21 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showThumbnails, setShowThumbnails] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [lang, setLang] = useState<Lang>('kr');
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        const data = getAllAssetsImages();
-        setSlides(data);
-      } catch (error) {
-        console.error('Error fetching images:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchImages();
-  }, []);
+    setLoading(true);
+    try {
+      const data = getAllAssetsImages(lang);
+      setSlides(data);
+      setCurrentIndex(0);
+    } catch (error) {
+      console.error('Error fetching images:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [lang]);
 
   const nextSlide = () => {
     if (slides.length === 0) return;
@@ -111,14 +118,25 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight">Slide Presenter</h1>
-            <p className="text-xs text-neutral-400">Viewing media from /public/images</p>
+            <p className="text-xs text-neutral-400">Viewing media from /src/assets/images</p>
           </div>
         </div>
-        
-        <div className="flex items-center gap-2">
-          <div className="bg-neutral-800 px-4 py-2 rounded-full text-xs font-mono text-neutral-400 border border-white/5">
-            {slides.length} items found
-          </div>
+
+        {/* 언어 선택기 */}
+        <div className="flex gap-1">
+          {(Object.keys(LANG_LABELS) as Lang[]).map((l) => (
+            <button
+              key={l}
+              onClick={() => setLang(l)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                lang === l
+                  ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30'
+                  : 'bg-neutral-800 text-neutral-400 hover:text-white border border-white/5'
+              }`}
+            >
+              {LANG_LABELS[l]}
+            </button>
+          ))}
         </div>
       </header>
 
