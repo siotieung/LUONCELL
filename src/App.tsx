@@ -28,8 +28,8 @@ import { getAllAssetsImages } from './Utils';
 type Lang = 'kr' | 'en' | 'zh';
 
 const LANG_LABELS: Record<Lang, string> = {
-  kr: '한국어',
-  en: 'English',
+  kr: 'KR',
+  en: 'EN',
   zh: '中文',
 };
 
@@ -117,7 +117,7 @@ export default function App() {
             <LayoutGrid className="text-white" size={24} />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight">Slide Presenter</h1>
+            <h1 className="text-xl font-bold tracking-tight">Luoncell</h1>
             <p className="text-xs text-neutral-400">Viewing media from /src/assets/images</p>
           </div>
         </div>
