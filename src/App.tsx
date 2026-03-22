@@ -160,7 +160,8 @@ export default function App() {
             {/* Main Viewer */}
             <div 
               ref={containerRef}
-              className={`relative aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl group ${isFullscreen ? 'rounded-none' : ''}`}
+              className={`relative aspect-video rounded-2xl overflow-hidden shadow-2xl group ${isFullscreen ? 'rounded-none' : ''}`}
+              style={{ background: 'linear-gradient(to bottom, #c8d4b8, #f0f0e8)' }}
             >
               <AnimatePresence mode="wait">
                 <motion.div
