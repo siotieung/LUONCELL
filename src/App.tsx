@@ -290,7 +290,7 @@ export default function App() {
               {/* Mobile: 전체화면 버튼 상단 우측 고정 */}
               <button
                 onClick={toggleFullscreen}
-                className="absolute top-3 right-3 md:hidden p-2.5 bg-black/60 backdrop-blur-md rounded-full border border-white/20 text-white active:scale-95 transition-all"
+                className="absolute top-3 right-3 md:hidden p-2.5 bg-black/60 backdrop-blur-md rounded-full border border-white/20 text-white active:scale-95 transition-all z-20"
               >
                 {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
               </button>
