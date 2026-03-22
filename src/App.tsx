@@ -66,7 +66,14 @@ export default function App() {
     setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+
   const toggleFullscreen = () => {
+    if (isIOS) {
+      // iOS는 requestFullscreen 미지원 → CSS 기반 가짜 전체화면
+      setIsFullscreen((prev) => !prev);
+      return;
+    }
     if (!document.fullscreenElement) {
       containerRef.current?.requestFullscreen();
       setIsFullscreen(true);
@@ -78,7 +85,7 @@ export default function App() {
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      if (!isIOS) setIsFullscreen(!!document.fullscreenElement);
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
@@ -159,8 +166,17 @@ export default function App() {
             {/* Main Viewer */}
             <div
               ref={containerRef}
-              className={`relative aspect-video rounded-2xl overflow-hidden shadow-2xl group ${isFullscreen ? 'rounded-none' : ''}`}
-              style={{ background: 'linear-gradient(to bottom, #c8d4b8, #f0f0e8)' }}
+              className={`relative overflow-hidden shadow-2xl group ${isFullscreen ? 'rounded-none' : 'aspect-video rounded-2xl'}`}
+              style={{
+                background: 'linear-gradient(to bottom, #c8d4b8, #f0f0e8)',
+                ...(isIOS && isFullscreen ? {
+                  position: 'fixed',
+                  inset: 0,
+                  width: '100vw',
+                  height: '100dvh',
+                  zIndex: 9999,
+                } : {}),
+              }}
             >
               <AnimatePresence mode="wait">
                 <motion.div
