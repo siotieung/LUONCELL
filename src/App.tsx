@@ -109,11 +109,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white font-sans selection:bg-emerald-500/30">
+    <div className="min-h-screen bg-neutral-900 text-white font-sans selection:bg-[#8a9e7a]/30">
       {/* Header */}
       <header className="p-4 border-b border-white/10 flex justify-between items-center bg-neutral-900/50 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <div className="w-10 h-10 bg-[#8a9e7a] rounded-xl flex items-center justify-center shadow-lg shadow-[#8a9e7a]/20">
             <LayoutGrid className="text-white" size={24} />
           </div>
           <div>
@@ -129,7 +129,7 @@ export default function App() {
               onClick={() => setLang(l)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 lang === l
-                  ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30'
+                  ? 'bg-[#8a9e7a] text-white shadow-md shadow-[#8a9e7a]/30'
                   : 'bg-neutral-800 text-neutral-400 hover:text-white border border-white/5'
               }`}
             >
@@ -142,7 +142,7 @@ export default function App() {
       <main className="max-w-7xl mx-auto p-4 md:p-8">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#8a9e7a]"></div>
           </div>
         ) : slides.length === 0 ? (
           <div className="mt-12 border-2 border-dashed border-white/10 rounded-3xl p-20 flex flex-col items-center justify-center">
@@ -157,7 +157,7 @@ export default function App() {
         ) : (
           <div className="space-y-6">
             {/* Main Viewer */}
-            <div 
+            <div
               ref={containerRef}
               className={`relative aspect-video rounded-2xl overflow-hidden shadow-2xl group ${isFullscreen ? 'rounded-none' : ''}`}
               style={{ background: 'linear-gradient(to bottom, #c8d4b8, #f0f0e8)' }}
@@ -195,21 +195,21 @@ export default function App() {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Controls Overlay */}
-              <div className="absolute inset-0 flex flex-col justify-between p-6 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none">
+              {/* Desktop Controls Overlay (hover) */}
+              <div className="absolute inset-0 hidden md:flex flex-col justify-between p-6 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none">
                 <div className="flex justify-between items-start pointer-events-auto">
                   <div className="bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-sm font-medium border border-white/10">
                     {currentIndex + 1} / {slides.length} — {slides[currentIndex].name}
                   </div>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => setIsPlaying(!isPlaying)}
                       className="p-2.5 bg-black/50 backdrop-blur-md rounded-full border border-white/10 hover:bg-white hover:text-black transition-all"
                       title={isPlaying ? "Pause" : "Play Slideshow"}
                     >
                       {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                     </button>
-                    <button 
+                    <button
                       onClick={toggleFullscreen}
                       className="p-2.5 bg-black/50 backdrop-blur-md rounded-full border border-white/10 hover:bg-white hover:text-black transition-all"
                       title="Toggle Fullscreen"
@@ -218,15 +218,14 @@ export default function App() {
                     </button>
                   </div>
                 </div>
-
                 <div className="flex justify-between items-center pointer-events-auto">
-                  <button 
+                  <button
                     onClick={prevSlide}
                     className="p-4 bg-black/50 backdrop-blur-md rounded-full border border-white/10 hover:bg-white hover:text-black transition-all"
                   >
                     <ChevronLeft size={32} />
                   </button>
-                  <button 
+                  <button
                     onClick={nextSlide}
                     className="p-4 bg-black/50 backdrop-blur-md rounded-full border border-white/10 hover:bg-white hover:text-black transition-all"
                   >
@@ -234,13 +233,48 @@ export default function App() {
                   </button>
                 </div>
               </div>
+
+              {/* Mobile: 슬라이드 번호 상단 고정 */}
+              <div className="absolute top-3 left-3 md:hidden bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium border border-white/10 pointer-events-none">
+                {currentIndex + 1} / {slides.length}
+              </div>
+
+              {/* Mobile: 전체화면 버튼 상단 우측 고정 */}
+              <button
+                onClick={toggleFullscreen}
+                className="absolute top-3 right-3 md:hidden p-2.5 bg-black/60 backdrop-blur-md rounded-full border border-white/20 text-white active:scale-95 transition-all"
+              >
+                {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+              </button>
+            </div>
+
+            {/* Mobile Controls Bar */}
+            <div className="flex md:hidden items-center justify-between gap-3 bg-neutral-800/80 rounded-2xl px-4 py-3 border border-white/5">
+              <button
+                onClick={prevSlide}
+                className="flex-1 flex justify-center p-3 bg-neutral-700 rounded-xl active:scale-95 transition-all"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="flex-1 flex justify-center p-3 bg-neutral-700 rounded-xl active:scale-95 transition-all"
+              >
+                {isPlaying ? <Pause size={22} /> : <Play size={22} />}
+              </button>
+              <button
+                onClick={nextSlide}
+                className="flex-1 flex justify-center p-3 bg-neutral-700 rounded-xl active:scale-95 transition-all"
+              >
+                <ChevronRight size={24} />
+              </button>
             </div>
 
             {/* Thumbnail Strip */}
             <div className="bg-neutral-800/50 p-4 rounded-2xl border border-white/5">
               <div className="flex justify-between items-center mb-4 px-2">
                 <h3 className="font-semibold flex items-center gap-2">
-                  <LayoutGrid size={18} className="text-emerald-500" />
+                  <LayoutGrid size={18} className="text-[#8a9e7a]" />
                   Slides
                 </h3>
                 <button 
@@ -256,8 +290,8 @@ export default function App() {
                   {slides.map((slide, index) => (
                     <div 
                       key={slide.id}
-                      className={`relative flex-shrink-0 w-40 aspect-video rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
-                        currentIndex === index ? 'border-emerald-500 scale-105 shadow-lg shadow-emerald-500/20' : 'border-transparent opacity-60 hover:opacity-100'
+                      className={`relative flex-shrink-0 w-24 sm:w-32 md:w-40 aspect-video rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
+                        currentIndex === index ? 'border-[#8a9e7a] scale-105 shadow-lg shadow-[#8a9e7a]/20' : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                       onClick={() => setCurrentIndex(index)}
                     >
