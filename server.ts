@@ -17,24 +17,6 @@ async function startServer() {
     fs.mkdirSync(imagesDir, { recursive: true });
   }
 
-  // API to list images in the images folder
-  app.get("/api/images", (req, res) => {
-    try {
-      const files = fs.readdirSync(imagesDir);
-      const imageFiles = files.filter(file => 
-        /\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|ogg)$/i.test(file)
-      );
-      res.json(imageFiles.map(file => ({
-        id: file,
-        url: `/images/${file}`,
-        name: file
-      })));
-    } catch (error) {
-      console.error("Error reading images directory:", error);
-      res.status(500).json({ error: "Failed to read images" });
-    }
-  });
-
   // Serve static images
   app.use("/images", express.static(imagesDir));
 

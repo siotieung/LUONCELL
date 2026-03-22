@@ -23,31 +23,23 @@ interface Slide {
   name: string;
 }
 
+const SAMPLE_SLIDES: Slide[] = [
+  { id: '1', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80', name: 'Alpine Peaks' },
+  { id: '2', url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1920&q=80', name: 'Serene Lake' },
+  { id: '3', url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1920&q=80', name: 'Sunlit Forest' },
+  { id: '4', url: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1920&q=80', name: 'Coastal Sunset' },
+  { id: '5', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80', name: 'Valley Mist' },
+  { id: '6', url: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=1920&q=80', name: 'Mountain Waterfall' },
+];
+
 export default function App() {
-  const [slides, setSlides] = useState<Slide[]>([]);
+  const [slides, setSlides] = useState<Slide[]>(SAMPLE_SLIDES);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showThumbnails, setShowThumbnails] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        const response = await fetch('/api/images');
-        if (!response.ok) throw new Error('Failed to fetch images');
-        const data = await response.json();
-        setSlides(data);
-      } catch (error) {
-        console.error('Error fetching images:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchImages();
-  }, []);
 
   const nextSlide = () => {
     if (slides.length === 0) return;
