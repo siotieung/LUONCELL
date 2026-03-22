@@ -1,0 +1,5 @@
+{
+  "name": "Image Slide Presenter",
+  "description": "An application to view images from a local /public/images folder as a presentation slide deck.",
+  "requestFramePermissions": []
+}

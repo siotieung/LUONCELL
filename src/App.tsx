@@ -1,0 +1,292 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Upload, 
+  Maximize2, 
+  Minimize2, 
+  X, 
+  Play, 
+  Pause,
+  LayoutGrid
+} from 'lucide-react';
+
+interface Slide {
+  id: string;
+  url: string;
+  name: string;
+}
+
+export default function App() {
+  const [slides, setSlides] = useState<Slide[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showThumbnails, setShowThumbnails] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const response = await fetch('/api/images');
+        if (!response.ok) throw new Error('Failed to fetch images');
+        const data = await response.json();
+        setSlides(data);
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, []);
+
+  const nextSlide = () => {
+    if (slides.length === 0) return;
+    setCurrentIndex((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    if (slides.length === 0) return;
+    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isPlaying && slides.length > 0) {
+      interval = setInterval(nextSlide, 3000);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, slides.length]);
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+    if (e.key === 'ArrowLeft') prevSlide();
+    if (e.key === 'f') toggleFullscreen();
+    if (e.key === 'Escape' && isFullscreen) setIsFullscreen(false);
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [slides.length]);
+
+  const isVideo = (url: string) => {
+    return /\.(mp4|webm|ogg)$/i.test(url);
+  };
+
+  return (
+    <div className="min-h-screen bg-neutral-900 text-white font-sans selection:bg-emerald-500/30">
+      {/* Header */}
+      <header className="p-4 border-b border-white/10 flex justify-between items-center bg-neutral-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <LayoutGrid className="text-white" size={24} />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Slide Presenter</h1>
+            <p className="text-xs text-neutral-400">Viewing media from /public/images</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <div className="bg-neutral-800 px-4 py-2 rounded-full text-xs font-mono text-neutral-400 border border-white/5">
+            {slides.length} items found
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto p-4 md:p-8">
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+          </div>
+        ) : slides.length === 0 ? (
+          <div className="mt-12 border-2 border-dashed border-white/10 rounded-3xl p-20 flex flex-col items-center justify-center">
+            <div className="w-20 h-20 bg-neutral-800 rounded-full flex items-center justify-center mb-6">
+              <LayoutGrid className="text-neutral-400" size={40} />
+            </div>
+            <h2 className="text-2xl font-semibold mb-2">No media found</h2>
+            <p className="text-neutral-500 max-w-xs text-center">
+              Please place your images or videos in the <code className="bg-neutral-800 px-1 rounded text-emerald-400">/public/images</code> folder to see them here.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Main Viewer */}
+            <div 
+              ref={containerRef}
+              className={`relative aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl group ${isFullscreen ? 'rounded-none' : ''}`}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={slides[currentIndex].id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="w-full h-full flex items-center justify-center"
+                >
+                  {isVideo(slides[currentIndex].url) ? (
+                    <video
+                      src={slides[currentIndex].url}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <img
+                      src={slides[currentIndex].url}
+                      alt={slides[currentIndex].name}
+                      className="w-full h-full object-contain"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = `https://picsum.photos/seed/${slides[currentIndex].id}/1920/1080`;
+                      }}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Controls Overlay */}
+              <div className="absolute inset-0 flex flex-col justify-between p-6 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none">
+                <div className="flex justify-between items-start pointer-events-auto">
+                  <div className="bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-sm font-medium border border-white/10">
+                    {currentIndex + 1} / {slides.length} — {slides[currentIndex].name}
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setIsPlaying(!isPlaying)}
+                      className="p-2.5 bg-black/50 backdrop-blur-md rounded-full border border-white/10 hover:bg-white hover:text-black transition-all"
+                      title={isPlaying ? "Pause" : "Play Slideshow"}
+                    >
+                      {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                    </button>
+                    <button 
+                      onClick={toggleFullscreen}
+                      className="p-2.5 bg-black/50 backdrop-blur-md rounded-full border border-white/10 hover:bg-white hover:text-black transition-all"
+                      title="Toggle Fullscreen"
+                    >
+                      {isFullscreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pointer-events-auto">
+                  <button 
+                    onClick={prevSlide}
+                    className="p-4 bg-black/50 backdrop-blur-md rounded-full border border-white/10 hover:bg-white hover:text-black transition-all"
+                  >
+                    <ChevronLeft size={32} />
+                  </button>
+                  <button 
+                    onClick={nextSlide}
+                    className="p-4 bg-black/50 backdrop-blur-md rounded-full border border-white/10 hover:bg-white hover:text-black transition-all"
+                  >
+                    <ChevronRight size={32} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Thumbnail Strip */}
+            <div className="bg-neutral-800/50 p-4 rounded-2xl border border-white/5">
+              <div className="flex justify-between items-center mb-4 px-2">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <LayoutGrid size={18} className="text-emerald-500" />
+                  Slides
+                </h3>
+                <button 
+                  onClick={() => setShowThumbnails(!showThumbnails)}
+                  className="text-xs text-neutral-400 hover:text-white transition-colors"
+                >
+                  {showThumbnails ? 'Hide Thumbnails' : 'Show Thumbnails'}
+                </button>
+              </div>
+              
+              {showThumbnails && (
+                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                  {slides.map((slide, index) => (
+                    <div 
+                      key={slide.id}
+                      className={`relative flex-shrink-0 w-40 aspect-video rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
+                        currentIndex === index ? 'border-emerald-500 scale-105 shadow-lg shadow-emerald-500/20' : 'border-transparent opacity-60 hover:opacity-100'
+                      }`}
+                      onClick={() => setCurrentIndex(index)}
+                    >
+                      {isVideo(slide.url) ? (
+                        <div className="w-full h-full bg-neutral-700 flex items-center justify-center">
+                          <Play size={24} className="text-white/50" />
+                        </div>
+                      ) : (
+                        <img 
+                          src={slide.url} 
+                          alt={slide.name} 
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://picsum.photos/seed/${slide.id}/400/225`;
+                          }}
+                        />
+                      )}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-1 text-[10px] truncate">
+                        {index + 1}. {slide.name}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Instructions */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-neutral-400">
+              <div className="bg-neutral-800/30 p-4 rounded-xl border border-white/5">
+                <span className="font-bold text-white block mb-1">Navigation</span>
+                Use arrow keys or the on-screen buttons to move between slides.
+              </div>
+              <div className="bg-neutral-800/30 p-4 rounded-xl border border-white/5">
+                <span className="font-bold text-white block mb-1">Slideshow</span>
+                Click the play button to automatically cycle through items every 3 seconds.
+              </div>
+              <div className="bg-neutral-800/30 p-4 rounded-xl border border-white/5">
+                <span className="font-bold text-white block mb-1">Shortcuts</span>
+                <kbd className="bg-neutral-700 px-1.5 py-0.5 rounded text-xs text-neutral-200">F</kbd> Fullscreen, 
+                <kbd className="bg-neutral-700 px-1.5 py-0.5 rounded text-xs text-neutral-200 ml-1">Space</kbd> Next
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
