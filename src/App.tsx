@@ -111,6 +111,32 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [slides.length]);
 
+  // 모바일 Android 뒤로가기 버튼 → 이전 슬라이드 이동
+  useEffect(() => {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (!isMobile || slides.length === 0) return;
+
+    // 더미 히스토리 상태를 push해 뒤로가기 버튼을 가로챌 수 있게 준비
+    window.history.pushState({ slidePresenter: true }, '');
+
+    const handlePopState = () => {
+      setCurrentIndex((prev) => {
+        if (prev > 0) {
+          // 이전 슬라이드로 이동하고 상태를 다시 push (계속 가로챌 수 있도록)
+          window.history.pushState({ slidePresenter: true }, '');
+          return prev - 1;
+        } else {
+          // 첫 슬라이드에서는 상태를 재push해 앱 종료/이탈 방지
+          window.history.pushState({ slidePresenter: true }, '');
+          return prev;
+        }
+      });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [slides.length]);
+
   const isVideo = (url: string) => {
     return /\.(mp4|webm|ogg)$/i.test(url);
   };
@@ -178,6 +204,12 @@ export default function App() {
                 } : {}),
               }}
             >
+              {/* 모바일 좌/우 터치 영역 */}
+              <div className="absolute inset-0 flex md:hidden pointer-events-auto z-10">
+                <div className="w-1/2 h-full" onClick={prevSlide} />
+                <div className="w-1/2 h-full" onClick={nextSlide} />
+              </div>
+
               <AnimatePresence mode="wait">
                 <motion.div
                   key={slides[currentIndex].id}
