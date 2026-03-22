@@ -118,7 +118,6 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight">Luoncell</h1>
-            <p className="text-xs text-neutral-400">Viewing media from /src/assets/images</p>
           </div>
         </div>
 
@@ -287,22 +286,6 @@ export default function App() {
               )}
             </div>
 
-            {/* Instructions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-neutral-400">
-              <div className="bg-neutral-800/30 p-4 rounded-xl border border-white/5">
-                <span className="font-bold text-white block mb-1">Navigation</span>
-                Use arrow keys or the on-screen buttons to move between slides.
-              </div>
-              <div className="bg-neutral-800/30 p-4 rounded-xl border border-white/5">
-                <span className="font-bold text-white block mb-1">Slideshow</span>
-                Click the play button to automatically cycle through items every 3 seconds.
-              </div>
-              <div className="bg-neutral-800/30 p-4 rounded-xl border border-white/5">
-                <span className="font-bold text-white block mb-1">Shortcuts</span>
-                <kbd className="bg-neutral-700 px-1.5 py-0.5 rounded text-xs text-neutral-200">F</kbd> Fullscreen, 
-                <kbd className="bg-neutral-700 px-1.5 py-0.5 rounded text-xs text-neutral-200 ml-1">Space</kbd> Next
-              </div>
-            </div>
           </div>
         )}
       </main>
