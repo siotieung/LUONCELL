@@ -113,8 +113,8 @@ export default function App() {
       {/* Header */}
       <header className="p-4 border-b border-white/10 flex justify-between items-center bg-neutral-900/50 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#8a9e7a] rounded-xl flex items-center justify-center shadow-lg shadow-[#8a9e7a]/20">
-            <LayoutGrid className="text-white" size={24} />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-[#8a9e7a]/20" style={{ background: 'linear-gradient(to bottom, #c8d4b8, #f0f0e8)' }}>
+            <LayoutGrid className="text-[#5a7048]" size={24} />
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight">Luoncell</h1>
@@ -199,7 +199,7 @@ export default function App() {
               <div className="absolute inset-0 hidden md:flex flex-col justify-between p-6 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none">
                 <div className="flex justify-between items-start pointer-events-auto">
                   <div className="bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-sm font-medium border border-white/10">
-                    {currentIndex + 1} / {slides.length} — {slides[currentIndex].name}
+                    {currentIndex + 1} / {slides.length}
                   </div>
                   <div className="flex gap-2">
                     <button
