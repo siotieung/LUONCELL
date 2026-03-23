@@ -2,7 +2,7 @@
 
 // 언어 코드: 'kr' | 'en' | 'zh'
 export const getAllAssetsImages = (lang = 'kr') => {
-  const modules = import.meta.glob('./assets/images/*.{png,jpg,jpeg,svg,mp4}', { eager: true });
+  const modules = import.meta.glob('./assets/images/*.{png,jpg,jpeg,svg,mp4,gif}', { eager: true });
 
   const allFiles = Object.entries(modules).map(([path, module]) => {
     const fileName = path.split('/').pop() ?? '';
