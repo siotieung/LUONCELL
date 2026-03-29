@@ -1,6 +1,6 @@
 // src/utils/imageLoader.js
 
-// 언어 코드: 'kr' | 'en' | 'zh' | 'jp'
+// 언어 코드: 'kr' | 'en' 
 export const getAllAssetsImages = (lang = 'kr') => {
   const modules = import.meta.glob('./assets/images/*.{png,jpg,jpeg,svg,mp4,gif}', { eager: true });
 
@@ -8,7 +8,7 @@ export const getAllAssetsImages = (lang = 'kr') => {
     const fileName = path.split('/').pop() ?? '';
     const nameWithoutExt = fileName.replace(/\.[^/.]+$/, ''); // 확장자 제거
     // baseName: 언어 접미사 제거 (e.g. "001_en" -> "001", "001" -> "001")
-    const baseName = nameWithoutExt.replace(/_(?:kr|en|zh|jp)$/, '');
+    const baseName = nameWithoutExt.replace(/_(?:kr|en)$/, '');
     const langMatch = nameWithoutExt.match(/_([a-z]+)$/)?.[1] ?? null;
     return { path, fileName, nameWithoutExt, baseName, langMatch, url: module.default };
   });
