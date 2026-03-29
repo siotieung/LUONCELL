@@ -21,12 +21,10 @@ export const getAllAssetsImages = (lang = 'kr') => {
     let file = allFiles.find(f => f.baseName === baseName && f.langMatch === lang);
     // 2순위: 한국어 기본 파일 (001_kr)
     if (!file) file = allFiles.find(f => f.baseName === baseName && f.langMatch === 'kr');
-    // 3순위: 일본어 기본 파일 (001_jp)
-    if (!file) file = allFiles.find(f => f.baseName === baseName && f.langMatch === 'jp');
-    // 4순위: 접미사 없는 기본 파일 (001)
+    // 3순위: 접미사 없는 기본 파일 (001)
     if (!file) file = allFiles.find(f => f.baseName === baseName && f.langMatch === null);
-    // 5순위: 같은 baseName의 비-EN/비-ZH/비-JP 파일 (언어 우선순위에서 en/zh/jp 제외)
-    if (!file) file = allFiles.find(f => f.baseName === baseName && f.langMatch !== 'en' && f.langMatch !== 'zh' && f.langMatch !== 'jp');
+    // 4순위: 영어가 아닌 파일 (마지막 예외 처리)
+    if (!file) file = allFiles.find(f => f.baseName === baseName && f.langMatch !== 'en');
 
     if (!file) return null;
 
