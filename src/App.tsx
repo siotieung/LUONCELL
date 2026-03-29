@@ -25,12 +25,13 @@ interface Slide {
 
 import { getAllAssetsImages } from './Utils';
 
-type Lang = 'kr' | 'en' | 'zh';
+type Lang = 'kr' | 'en' | 'zh' | 'jp';
 
 const LANG_LABELS: Record<Lang, string> = {
   kr: 'KR',
   en: 'EN',
   zh: '中文',
+  jp: '日本語',
 };
 
 export default function App() {
